@@ -1,0 +1,246 @@
+% Presentation for MA 232 Group Project 2. Build: latexmk -xelatex slides.tex
+% Speaker notes: latexmk -xelatex -jobname=slides_notes slides.tex  (see Makefile)
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{fontspec}
+\setsansfont{Inter}[Scale=0.95]
+\usepackage{amsmath}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\setmathfont{Inter}[range={up/num,up/Latin,up/latin}, Scale=0.95]
+\usepackage{booktabs}
+\usefonttheme{professionalfonts}
+\graphicspath{{../figures/}}
+\input{../report/numbers.tex}
+\input{../report/authors.tex}
+
+\ifdefined\shownotes
+  \setbeameroption{show only notes}
+\fi
+
+\definecolor{ink}{HTML}{0B0B0B}
+\definecolor{ink2}{HTML}{52514E}
+\definecolor{tA}{HTML}{2A78D6}
+\definecolor{tB}{HTML}{EB6834}
+\definecolor{tC}{HTML}{1BAF7A}
+\setbeamercolor{normal text}{fg=ink,bg=white}
+\setbeamercolor{frametitle}{fg=ink,bg=white}
+\setbeamercolor{title}{fg=ink}
+\setbeamercolor{structure}{fg=ink2}
+\setbeamercolor{alerted text}{fg=tB}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}{\textendash}
+\setbeamertemplate{footline}{\hfill\textcolor{ink2}{\scriptsize\insertframenumber/\inserttotalframenumber}\hspace{1.2em}\vspace{0.8em}}
+\setbeamertemplate{note page}{\vspace{1em}\insertnote}
+
+\newcommand{\BetaD}{\text{Beta}}
+\newcommand{\headline}[1]{{\Huge\bfseries #1}}
+
+\title{Which Treatment Should We Choose?}
+\subtitle{A Bayesian comparison of three treatments}
+\author{\projectauthors}
+\hypersetup{pdfauthor={\projectauthors}}
+\institute{MA 232 Bayesian Statistical Methods \textbullet{} Group Project 2}
+\date{October 2026}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\note{Our project compares three treatments from a small simulated trial and asks which one to use.
+Everything we show comes from one script, and every probability is computed exactly.}
+\end{frame}
+
+\begin{frame}{The question}
+\begin{columns}[T]
+\column{0.45\textwidth}
+\begin{tabular}{lrrr}
+\toprule
+ & Patients & Successes & Rate\\
+\midrule
+\textcolor{tA}{A} & 100 & 62 & $\mleA$\\
+\textcolor{tB}{B} & 100 & 70 & $\mleB$\\
+\textcolor{tC}{C} & 100 & 66 & $\mleC$\\
+\bottomrule
+\end{tabular}
+
+\vspace{1em}
+\textcolor{ink2}{\small Simulated clinical-trial data from the project sheet.}
+\column{0.5\textwidth}
+\begin{itemize}
+\item How large is each success probability, and how sure are we?
+\item How do the treatments differ?
+\item What is $P(\text{B better than A})$?
+\item What is $P(\text{B is the best})$?
+\item Which treatment should we choose?
+\end{itemize}
+\end{columns}
+\note{B has the highest raw success rate, 70 out of 100, but with only 100 patients each the gaps
+of 4 and 8 percentage points could be noise. The question is how much the data really tell us.}
+\end{frame}
+
+\begin{frame}{Model: binomial data, Beta prior}
+\begin{itemize}
+\item Each patient succeeds independently with probability $\theta$:
+$\;f(\mathbf{x}\mid\theta)=\theta^{s}(1-\theta)^{n-s}$
+\item Neyman--Fisher: the count $s$ is sufficient; only the table matters
+\item Uniform prior $\BetaD(1,1)$ gives the conjugate posterior $\BetaD(s+1,\,n-s+1)$
+\end{itemize}
+\vspace{0.6em}
+\begin{center}
+\Large
+$\theta_A\sim\BetaD(\alphaA,\betaA)\qquad\theta_B\sim\BetaD(\alphaB,\betaB)\qquad\theta_C\sim\BetaD(\alphaC,\betaC)$
+\end{center}
+\vspace{0.4em}
+\textcolor{ink2}{\small Module 3 (sufficiency, MLE) \textbullet{} Module 4, Example 4.6 (Beta--binomial)}
+\note{The likelihood depends on the data only through the number of successes, so the table is all
+we need. A uniform prior expresses no preference, and the posterior is again Beta: add successes to
+the first parameter and failures to the second.}
+\end{frame}
+
+\begin{frame}{Estimates and uncertainty}
+\begin{columns}[c]
+\column{0.62\textwidth}
+\includegraphics[width=\linewidth]{fig1_posteriors.pdf}
+\column{0.36\textwidth}
+\small
+\begin{tabular}{lcc}
+\toprule
+ & Post.\ mean & 95\% CrI\\
+\midrule
+A & $\meanA$ & $\criloA$--$\crihiA$\\
+B & $\meanB$ & $\criloB$--$\crihiB$\\
+C & $\meanC$ & $\criloC$--$\crihiC$\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.8em}
+Each rate is known to about $\pm9$ points.\\[0.3em]
+Mean $<$ median $<$ mode: left-skewed posteriors.
+\end{columns}
+\note{The three posteriors overlap a lot. B is ahead with posterior mean \meanB, but its credible
+interval overlaps both others. The posterior mean is the Bayes estimator under squared-error loss;
+median and mode are in the report.}
+\end{frame}
+
+\begin{frame}{How do the treatments differ?}
+\includegraphics[width=\linewidth]{fig2_differences.pdf}
+\vspace{0.2em}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\alert{$P(\theta_B>\theta_A\mid\text{data})=\pgtBA$}\\
+\small$P(\theta_B-\theta_A>0.05)=\pmarginBA$
+\column{0.48\textwidth}
+\small Classical test of B vs A: $p=\pvalBA$, ``not significant''.\\
+It cannot say how likely B is to be better.
+\end{columns}
+\note{The shaded area is the probability that the first treatment is better. B beats A with
+probability \pgtBA, but a gain of more than 5 points is less certain, \pmarginBA. The p-value of
+\pvalBA{} answers a different question.}
+\end{frame}
+
+\begin{frame}{Exact, not simulated}
+\[
+P(\theta_B>\theta_A\mid\text{data})=\int_0^1 f_B(t)\,F_A(t)\,dt
+\]
+\begin{itemize}
+\item Whole-number Beta parameters: $f_B$ and $F_A$ are \textbf{polynomials} with rational coefficients
+\item So the answer is an exact fraction: $\pgtlongBA\ldots$
+\item Same fraction from an independent finite-sum formula; quadrature agrees to $10^{-12}$
+\item Monte Carlo, $\mcdraws$ draws: every estimate within $\mcmaxabsz$ standard errors
+\end{itemize}
+\note{Because the parameters are whole numbers, the densities and CDFs are polynomials, so these
+integrals have exact rational values. We checked them with a second exact formula, numerical
+integration and simulation.}
+\end{frame}
+
+\begin{frame}{Which treatment is best?}
+\includegraphics[width=\linewidth]{fig3_best.pdf}
+\begin{center}
+$P(k\text{ best})=\int_0^1 f_k(t)\prod_{j\neq k}F_j(t)\,dt$ \qquad
+\alert{$P(\text{B best})=\pbestB$}
+\end{center}
+\note{B is the most likely best treatment, \pbestB, then C, \pbestC. On the right is the expected
+loss of each choice, the success rate we would expect to give up by not picking the true best.}
+\end{frame}
+
+\begin{frame}{Choosing is a Bayes decision}
+\begin{columns}[T]
+\column{0.42\textwidth}
+\textbf{Minimise posterior expected loss}\\[0.3em]
+\small
+Opportunity loss $\max_j\theta_j-\theta_k$\\ $\Rightarrow$ largest posterior mean: \alert{B}\\[0.4em]
+Zero--one loss (not the best)\\ $\Rightarrow$ largest $P(\text{best})$: \alert{B}\\[0.6em]
+\textcolor{ink2}{Module 4, Definition 4.3}
+\column{0.56\textwidth}
+\small
+\begin{tabular}{lccc}
+\toprule
+Prior & $P(\theta_B>\theta_A)$ & $P(\text{B best})$ & Choice\\
+\midrule
+$\BetaD(1,1)$ & $\sUnipBA$ & $\sUnipbestB$ & \sUnidec\\
+Jeffreys & $\sJefpBA$ & $\sJefpbestB$ & \sJefdec\\
+$\BetaD(2,2)$ & $\sBttpBA$ & $\sBttpbestB$ & \sBttdec\\
+$\BetaD(10,10)$ & $\sBtenpBA$ & $\sBtenpbestB$ & \sBtendec\\
+\bottomrule
+\end{tabular}
+\end{columns}
+\note{Both natural loss functions pick B, and the choice does not change under any of four priors,
+including a fairly strong Beta(10,10) prior centred on 50 percent.}
+\end{frame}
+
+\begin{frame}{How sure are we about B over C?}
+\begin{columns}[c]
+\column{0.55\textwidth}
+\includegraphics[width=\linewidth]{fig4_more_data.pdf}
+\column{0.43\textwidth}
+\begin{itemize}
+\item $P(\theta_B>\theta_C)=\pgtBC$ only
+\item 95\% CrI for $\theta_B-\theta_C$: $\dloBC$ to $\dhiBC$
+\item If the rates held, $P(\text{B best})$ would reach $0.95$ at about $\scencross$ patients per arm
+\end{itemize}
+\textcolor{ink2}{\scriptsize Illustration only, not a prediction.}
+\end{columns}
+\note{B is clearly better than A, but only modestly ahead of C. Even if the observed rates held
+exactly, we would need roughly \scencross{} patients per arm to be 95 percent sure B is best.}
+\end{frame}
+
+\begin{frame}{Course check: Lindley and Tierney--Kadane (Module 5)}
+\small
+\begin{tabular}{lccccc}
+\toprule
+ & Exact $E[\theta]$ & Lindley error & T--K error & Exact $E[\text{odds}]$ & T--K error\\
+\midrule
+A & $\mmeanexA$ & $\mmeanlierrA$ & $\mmeantkerrA$ & $\moddsexA$ & $\moddstkerrA$\\
+B & $\mmeanexB$ & $\mmeanlierrB$ & $\mmeantkerrB$ & $\moddsexB$ & $\moddstkerrB$\\
+C & $\mmeanexC$ & $\mmeanlierrC$ & $\mmeantkerrC$ & $\moddsexC$ & $\moddstkerrC$\\
+\bottomrule
+\end{tabular}
+\normalsize
+\begin{itemize}
+\item Our code reproduces the slides' example: Lindley $1.9965$, T--K $1.995138$
+\item Errors $\approx10^{-4}=O(n^{-2})$; Lindley is \emph{exact} for the odds, $(s+1)/(n-s)$
+\end{itemize}
+\note{Our problem has exact answers, so it is a clean test of the Module 5 approximations. After
+reproducing the course example, both methods are accurate to about one part in ten thousand, and
+Lindley's terms add up exactly for the odds.}
+\end{frame}
+
+\begin{frame}{Recommendation}
+\begin{center}
+\headline{Choose treatment \textcolor{tB}{B}}
+\end{center}
+\vspace{0.4em}
+\begin{itemize}
+\item Highest success rate: $\meanB$ (95\% CrI $\criloB$--$\crihiB$)
+\item Most likely best: $\pbestB$; smallest expected loss: $\elossptsB$ points
+\item The same under every prior we tried
+\end{itemize}
+\vspace{0.3em}
+\textcolor{ink2}{\small Caveats: B vs C is not settled; simulated data; success is the only outcome;
+independent arms assumed. A further B-versus-C trial is justified if the stakes are high.}
+\note{Our recommendation is B. It has the highest estimated success rate, the highest chance of being
+best and the smallest expected loss, under every prior. B versus C is the open question.}
+\end{frame}
+
+\end{document}

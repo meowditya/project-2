@@ -1,4 +1,4 @@
-"""Draw the report and slide figures (PDF for LaTeX, PNG for the README).
+"""Draw the report figures (PDF for LaTeX; fig1 also as PNG for the README).
 
     python scripts/make_figures.py
 
@@ -43,11 +43,12 @@ def style() -> None:
     })
 
 
-def save(fig, name: str) -> None:
+def save(fig, name: str, png: bool = False) -> None:
     OUT.mkdir(exist_ok=True)
     # metadata pinned so rebuilding gives byte-identical files
     fig.savefig(OUT / f"{name}.pdf", bbox_inches="tight", metadata={"CreationDate": None, "ModDate": None})
-    fig.savefig(OUT / f"{name}.png", dpi=200, bbox_inches="tight", metadata={"Software": None})
+    if png:  # only the figure shown in the README
+        fig.savefig(OUT / f"{name}.png", dpi=200, bbox_inches="tight", metadata={"Software": None})
     plt.close(fig)
 
 
@@ -77,7 +78,7 @@ def fig_posteriors(posts) -> None:
     ax.set_axisbelow(True)
     ax.text(0.01, 0.97, "shaded: 95% credible interval\ndashed: posterior mean",
             transform=ax.transAxes, ha="left", va="top", fontsize=7.5, color=INK2)
-    save(fig, "fig1_posteriors")
+    save(fig, "fig1_posteriors", png=True)
 
 
 def fig_differences(posts) -> None:

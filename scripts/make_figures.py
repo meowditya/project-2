@@ -39,7 +39,7 @@ def style() -> None:
         "axes.edgecolor": MUTED, "xtick.color": INK2, "ytick.color": INK2,
         "axes.spines.top": False, "axes.spines.right": False, "legend.frameon": False,
         "savefig.facecolor": "white", "figure.facecolor": "white", "axes.facecolor": "white",
-        "pdf.fonttype": 42, "svg.fonttype": "none",
+        "pdf.fonttype": 3,
     })
 
 

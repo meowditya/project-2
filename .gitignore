@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+# LaTeX build files
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.out
+*.nav
+*.snm
+*.toc
+*.vrb
+*.xdv
+*.synctex.gz
+build*.log

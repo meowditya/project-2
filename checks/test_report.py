@@ -229,6 +229,21 @@ def test_group_members_everywhere():
         assert all(name in meta for name in GROUP), "PDF Author field"
 
 
+def test_code_link_in_report():
+    """The report names the repository, so the PDF alone leads to the code."""
+    url = "https://github.com/meowditya/project-2"
+    assert url in (ROOT / "report" / "report.tex").read_text(), "report.tex: repository link"
+    pdf = ROOT / "report" / "report.pdf"
+    if pdf.exists() and shutil.which("pdftotext"):
+        title = subprocess.run(["pdftotext", "-l", "1", str(pdf), "-"], capture_output=True, text=True).stdout
+        assert url in title, "report title page: repository link"
+        if shutil.which("pdfinfo"):
+            # the link must also be clickable, not just printed (older pdfinfo has no -url option)
+            res = subprocess.run(["pdfinfo", "-url", str(pdf)], capture_output=True, text=True)
+            if res.returncode == 0:
+                assert url in res.stdout, "report: repository link is not clickable"
+
+
 def test_pdf_fonts_are_clean_if_built():
     """Every font embedded, no bitmap fonts, and no font-type mismatch in the report or the figures."""
     if shutil.which("pdffonts") is None:

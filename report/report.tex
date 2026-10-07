@@ -27,11 +27,13 @@
 \newcommand{\tB}{\theta_B}
 \newcommand{\tC}{\theta_C}
 \newcommand{\course}[1]{\textcolor{black!60}{\small[#1]}}
+\newcommand{\repourl}{\url{https://github.com/meowditya/project-2}}
 
 \title{\vspace{-1.2em}\textbf{Which Treatment Should We Choose?}\\[0.3em]
 \large A Bayesian comparison of three treatments}
 \author{MA 232 Bayesian Statistical Methods \,·\, Group Project 2\\[0.2em]
-\projectauthors}
+\projectauthors\\[0.3em]
+{\normalsize Code, data and checks: \repourl}}
 \date{October 2026}
 
 \begin{document}
@@ -350,8 +352,7 @@ the course's worked-example values and descriptive ranges such as ``$\pm9$ perce
 checked separately in \texttt{checks/test\_report.py}. Each exact result was verified by a second exact method
 (the finite-sum formula, the binomial-tail form of the CDF, or a second integration order), by
 quadrature and by seeded Monte Carlo judged by its standard error. The conjugate posterior was also
-checked against Bayes' theorem evaluated numerically on a grid. The checks run with
-\texttt{python checks/run\_checks.py}.
+checked against Bayes' theorem evaluated numerically on a grid. The code and the checks are at \repourl.
 
 \appendix
 \section{Course mapping}

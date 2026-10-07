@@ -4,8 +4,8 @@
 
 Outputs
   results/results.json     all quantities (exact rationals as "p/q" strings too)
-  report/numbers.tex       LaTeX macros used by the report and the slides, so
-                           no number in either document is typed by hand
+  report/numbers.tex       LaTeX macros read by the report, so no number in it
+                           is typed by hand
 
 Main prior: independent Beta(1,1) for each treatment. Sensitivity priors:
 Jeffreys Beta(1/2,1/2), Beta(2,2), Beta(10,10).

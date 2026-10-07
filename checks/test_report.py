@@ -202,18 +202,28 @@ def test_readme_numbers_match_the_analysis():
                  f"{MACROS['elossptsB']} percentage points", f"{MACROS['elossptsC']} for C", f"{MACROS['elossptsA']} for A",
                  f"P(θ_B > θ_C) = {MACROS['pgtBC']}", "Lindley 1.9965", "Tierney–Kadane 1.995138"):
         assert text in readme, f"README claim {text!r}"
-    pages = {"report/report.pdf": "7-page", "slides/slides.pdf": "11-slide"}
-    for path, label in pages.items():
-        assert label in readme
-        pdf = ROOT / path
-        if pdf.exists() and shutil.which("pdfinfo"):
-            out = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
-            assert int(re.search(r"Pages:\s+(\d+)", out).group(1)) == int(label.split("-")[0]), path
+    assert "(7 pages)" in readme
+    pdf = ROOT / "report" / "report.pdf"
+    if pdf.exists() and shutil.which("pdfinfo"):
+        out = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
+        assert int(re.search(r"Pages:\s+(\d+)", out).group(1)) == 7, "README says 7 pages"
 
 
-def test_slides_typed_content():
-    slides = (ROOT / "slides" / "slides.tex").read_text()
-    for k, (n, s) in DATA.items():
-        assert re.search(rf"\\textcolor{{t{k}}}{{{k}}} & {n} & {s} &", slides), f"slide data row {k}"
-    assert r"\pm9" in slides and "Lindley $1.9965$" in slides and "T--K $1.995138$" in slides
-    assert "10^{-12}" in slides and r"\mcmaxabsz" in slides and r"\scencross" in slides
+GROUP = {"Aditya Singh": "250003007", "Hiransh Anand": "250041018", "Parth Pawar": "250041030",
+         "Tirthanker Singh": "250003081", "Gulam Abbas": "250041016"}
+
+
+def test_group_members_everywhere():
+    authors = (ROOT / "report" / "authors.tex").read_text()
+    readme = (ROOT / "README.md").read_text()
+    for name, roll in GROUP.items():
+        assert f"{name} ({roll})" in authors, f"authors.tex: {name}"
+        assert f"{name} ({roll})" in readme, f"README: {name}"
+        assert name in authors.split(r"\projectauthorsplain")[1], f"PDF metadata names: {name}"
+    pdf = ROOT / "report" / "report.pdf"
+    if pdf.exists() and shutil.which("pdftotext"):
+        text = subprocess.run(["pdftotext", "-l", "1", str(pdf), "-"], capture_output=True, text=True).stdout
+        for name, roll in GROUP.items():
+            assert f"{name} ({roll})" in text, f"report title page: {name} ({roll})"
+        meta = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
+        assert all(name in meta for name in GROUP), "PDF Author field"

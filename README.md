@@ -1,6 +1,9 @@
 # Which Treatment Should We Choose?
 
-MA 232 Bayesian Statistical Methods, Group Project 2. A Bayesian comparison of three treatments from simulated clinical-trial data:
+MA 232 Bayesian Statistical Methods, Group Project 2. A Bayesian comparison of three treatments from simulated clinical-trial data.
+
+**Group:** Aditya Singh (250003007), Hiransh Anand (250041018), Parth Pawar (250041030), Tirthanker Singh (250003081), Gulam Abbas (250041016).
+
 
 | Treatment | Patients | Successes |
 |---|---|---|
@@ -8,7 +11,7 @@ MA 232 Bayesian Statistical Methods, Group Project 2. A Bayesian comparison of t
 | B | 100 | 70 |
 | C | 100 | 66 |
 
-**Deliverables:** [`report/report.pdf`](report/report.pdf) (7-page report), [`slides/slides.pdf`](slides/slides.pdf) (11-slide talk) and [`slides/slides_notes.pdf`](slides/slides_notes.pdf) (speaker notes).
+**Report:** [`report/report.pdf`](report/report.pdf) (7 pages).
 
 ## Result
 
@@ -38,14 +41,14 @@ The Beta parameters are whole numbers, so every density and CDF is a polynomial 
 ```bash
 pip install -r requirements.txt
 python scripts/run_analysis.py    # all numbers -> results/results.json and report/numbers.tex
-python scripts/make_figures.py    # figures/*.pdf and *.png
+python scripts/make_figures.py    # figures/*.pdf
 python checks/run_checks.py       # independent verification
 ```
 
-To rebuild the documents (needs a TeX distribution with `latexmk`; the slides need XeLaTeX and the Inter font):
+To rebuild the report PDF (needs a TeX distribution with `latexmk`):
 
 ```bash
-make            # analysis, figures, report and slides
+make            # analysis, figures and report
 make check      # the checks only
 ```
 
@@ -65,15 +68,15 @@ src/treatment_bayes/
   approx.py                  Module 5 Lindley and Tierney-Kadane approximations
   montecarlo.py              seeded posterior simulation with standard errors
 scripts/run_analysis.py      computes everything; writes results and LaTeX macros
-scripts/make_figures.py      draws the four figures
+scripts/make_figures.py      draws the four report figures
 checks/                      independent checks (run_checks.py runs them all)
 report/report.tex            report source; numbers come from report/numbers.tex
-slides/slides.tex            slides and speaker notes
+report/authors.tex           group members' names and roll numbers
 ```
 
 ## Verification
 
-No result in the report or slides is typed by hand: `scripts/run_analysis.py` writes them all into `report/numbers.tex`, which both documents read. `checks/` then verifies each result by a different route:
+No result in the report is typed by hand: `scripts/run_analysis.py` writes them all into `report/numbers.tex`, which the report reads. `checks/` then verifies each result by a different route:
 
 - **Exact results:** a second exact method, either an independent finite-sum formula for P(X > Y) or the binomial-tail form of the Beta CDF.
 - **Floating-point results:** SciPy quadrature.

@@ -227,3 +227,20 @@ def test_group_members_everywhere():
             assert f"{name} ({roll})" in text, f"report title page: {name} ({roll})"
         meta = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout
         assert all(name in meta for name in GROUP), "PDF Author field"
+
+
+def test_pdf_fonts_are_clean_if_built():
+    """Every font embedded, no bitmap fonts, and no font-type mismatch in the report or the figures."""
+    if shutil.which("pdffonts") is None:
+        return
+    pdfs = [ROOT / "report" / "report.pdf"] + sorted((ROOT / "figures").glob("*.pdf"))
+    for pdf in pdfs:
+        if not pdf.exists():
+            continue
+        res = subprocess.run(["pdffonts", str(pdf)], capture_output=True, text=True)
+        assert "Mismatch" not in res.stderr, f"{pdf.name}: font type does not match the embedded font file"
+        for line in res.stdout.splitlines()[2:]:
+            cols = line.split()
+            emb, sub, uni = cols[-5], cols[-4], cols[-3]
+            assert emb == "yes", f"{pdf.name}: font not embedded: {line}"
+            assert not (" Type 3 " in line and uni == "no"), f"{pdf.name}: bitmap Type 3 font (no text mapping): {line}"
